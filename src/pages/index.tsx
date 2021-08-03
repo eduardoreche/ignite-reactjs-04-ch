@@ -18,26 +18,37 @@ export default function Home(): JSX.Element {
     hasNextPage,
   } = useInfiniteQuery(
     'images',
-    // TODO AXIOS REQUEST WITH PARAM
-    ,
-    // TODO GET AND RETURN NEXT PAGE PARAM
+    ({ pageParam = null }) =>
+      api.get(`/api/images?page=${pageParam}`).then(response => response.data),
+    {
+      getNextPageParam: (lastPage, pages) => lastPage.after,
+    }
   );
 
   const formattedData = useMemo(() => {
-    // TODO FORMAT AND FLAT DATA ARRAY
+    if (!data) return [];
+
+    return data.pages.map(page => page.data).flat();
   }, [data]);
 
   // TODO RENDER LOADING SCREEN
+  if (isLoading) return <Loading />;
 
   // TODO RENDER ERROR SCREEN
+  if (isError) return <Error />;
 
   return (
     <>
       <Header />
+      <h1>Oi{hasNextPage}</h1>
 
       <Box maxW={1120} px={20} mx="auto" my={20}>
         <CardList cards={formattedData} />
-        {/* TODO RENDER LOAD MORE BUTTON IF DATA HAS NEXT PAGE */}
+        {hasNextPage && (
+          <Button onClick={() => fetchNextPage()}>
+            {isFetchingNextPage ? 'Carregando...' : 'Carregar mais'}
+          </Button>
+        )}
       </Box>
     </>
   );
