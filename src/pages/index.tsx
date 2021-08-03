@@ -18,8 +18,10 @@ export default function Home(): JSX.Element {
     hasNextPage,
   } = useInfiniteQuery(
     'images',
-    ({ pageParam = null }) =>
-      api.get(`/api/images?page=${pageParam}`).then(response => response.data),
+    ({ pageParam = null }) => {
+      const url = pageParam ? `/api/images?page=${pageParam}` : '/api/images';
+      return api.get(url).then(response => response.data);
+    },
     {
       getNextPageParam: (lastPage, pages) => lastPage.after,
     }
@@ -31,16 +33,13 @@ export default function Home(): JSX.Element {
     return data.pages.map(page => page.data).flat();
   }, [data]);
 
-  // TODO RENDER LOADING SCREEN
   if (isLoading) return <Loading />;
 
-  // TODO RENDER ERROR SCREEN
   if (isError) return <Error />;
 
   return (
     <>
       <Header />
-      <h1>Oi{hasNextPage}</h1>
 
       <Box maxW={1120} px={20} mx="auto" my={20}>
         <CardList cards={formattedData} />
