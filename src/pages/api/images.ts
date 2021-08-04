@@ -25,6 +25,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<void> {
+  console.log(req.method);
   if (req.method === 'POST') {
     const { url, title, description } = req.body;
 

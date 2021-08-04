@@ -19,11 +19,11 @@ export default function Home(): JSX.Element {
   } = useInfiniteQuery(
     'images',
     ({ pageParam = null }) => {
-      const url = pageParam ? `/api/images?page=${pageParam}` : '/api/images';
+      const url = pageParam ? `/api/images?after=${pageParam}` : '/api/images';
       return api.get(url).then(response => response.data);
     },
     {
-      getNextPageParam: (lastPage, pages) => lastPage.after,
+      getNextPageParam: lastPage => (lastPage.after ? lastPage.after : null),
     }
   );
 
@@ -44,7 +44,7 @@ export default function Home(): JSX.Element {
       <Box maxW={1120} px={20} mx="auto" my={20}>
         <CardList cards={formattedData} />
         {hasNextPage && (
-          <Button onClick={() => fetchNextPage()}>
+          <Button type="button" onClick={() => fetchNextPage()}>
             {isFetchingNextPage ? 'Carregando...' : 'Carregar mais'}
           </Button>
         )}
